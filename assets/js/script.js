@@ -8,19 +8,18 @@ $(document).ready(function(){
               "death note", "rurouni kenshin", "dragon ball z",
               "sword art online", "spirited away"],
 
-        setButtons: function(buttonTopics) {
+        setInitialTopics: function(buttonTopics) {
             var topicArray = buttonTopics;
-            function setButton(topicsToBuild) {
+            function setTopic(topicsToBuild) {
                 for (var topicIndex = 0; topicIndex < topicsToBuild.length; topicIndex++) {
                     var button = topicsToBuild[topicIndex];
-                    console.log("New Button: " + button);
-                    giphy.buildButton(button);
+                    giphy.setButton(button);
                 }
             }
-            return setButton(topicArray);
+            return setTopic(topicArray);
         },
 
-        buildButton: function(button) {
+        setButton: function(button) {
             var newButtonTopic = button;
             function build(topic) {
                 var newButton = $("<button>");
@@ -28,6 +27,8 @@ $(document).ready(function(){
                 newButton.addClass("btn btn-primary");
                 newButton.text(topic.toLowerCase());
                 $("#animeButtons").append(newButton);
+                console.log("New Button: " + topic);
+
             }
             return build(newButtonTopic);
         },
@@ -35,8 +36,9 @@ $(document).ready(function(){
         checkTopicPush: function(newTopic) {
             var topic = newTopic.toLowerCase();
             function pushTopic(topicToAdd) {
-                if (giphy.topics.indexOf(topicToAdd) == -1) {
+                if (giphy.topics.indexOf(topicToAdd) == -1 && topicToAdd != "") {
                     giphy.topics.push(topicToAdd);
+                    giphy.setButton(topicToAdd);
                     console.log(giphy.topics);
                 }
             }
@@ -44,12 +46,19 @@ $(document).ready(function(){
         },
     }
 
-    giphy.setButtons(giphy.topics);
+    giphy.setInitialTopics(giphy.topics);
+    $(window).keydown(function(event){
+        if(event.keyCode == 13) {
+        event.preventDefault();
+        return false;
+        }
+    });
 
     $("#addAnime").on("click", function(){
-        var newAnime = $("#anime-input").val();
-        giphy.checkTopicPush(newAnime);
-        giphy.buildButton(newAnime);
+        var newTopic = $("#anime-input").val();
+        giphy.checkTopicPush(newTopic);
         $("#anime-input").val("");
+        console.log("Button Pressed");
+        return false;
     });
 });
