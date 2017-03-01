@@ -6,7 +6,7 @@ $(document).ready(function(){
               "gundam", "princess mononoke", "mob psycho 100", 
               "psycho pass", "outlaw star", "cowboy bebop", 
               "death note", "rurouni kenshin", "dragon ball z",
-              "sword art online", "spirited away"],
+              "sword art online", "spirited away", "FLCL"],
 
         setInitialTopics: function(buttonTopics) {
             var topicArray = buttonTopics;
@@ -36,7 +36,7 @@ $(document).ready(function(){
         checkTopicPush: function(newTopic) {
             var topic = newTopic.toLowerCase();
             function pushTopic(topicToAdd) {
-                if (giphy.topics.indexOf(topicToAdd) == -1 && topicToAdd != "") {
+                if (giphy.topics.indexOf(topicToAdd) == -1 && topicToAdd != "" && jQuery.trim(topicToAdd).length != 0) {
                     giphy.topics.push(topicToAdd);
                     giphy.setButton(topicToAdd);
                     console.log(giphy.topics);
@@ -59,6 +59,5 @@ $(document).ready(function(){
         giphy.checkTopicPush(newTopic);
         $("#anime-input").val("");
         console.log("Button Pressed");
-        return false;
     });
 });
