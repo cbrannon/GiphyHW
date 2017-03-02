@@ -7,7 +7,7 @@ $(document).ready(function(){
             "psycho pass", "outlaw star", "cowboy bebop", 
             "death note", "rurouni kenshin", "dragon ball z",
             "sword art online", "spirited away", "flcl", 
-            "pom poko", "my hero academia"],
+            "pom poko", "my hero academia", "gurren lagann"],
         
         apiData: null,
 
