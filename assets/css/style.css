@@ -8,16 +8,31 @@
 }
 
 .anime {
-    margin: 2px 2px 2px 0;
+    margin: 2px 5px 2px 0;
+    background: black;
+    border: none
 }
 
 .gifs {
     display: inline-block;
-    margin: 0 5px 10px 0;
+    margin: 0 10px 20px 0;
 }
 
+.imgs {
+    border-radius: 2px;
+}
+
+.form {
+    margin-bottom: 40px;
+}
+
+#anime-input {
+    margin-bottom: 10px;
+    color: #000;
+}
 /************** Colors *****************/
 body {
-    background: #fff;
+    background: #000;
+    color: #fff;
 }
 
