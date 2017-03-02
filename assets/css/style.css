@@ -1,0 +1,23 @@
+/************** Sizing and Format *****************/
+* {
+    box-sizing: border-box;
+}
+
+.main {
+    margin-top: 40px;
+}
+
+.anime {
+    margin: 2px 2px 2px 0;
+}
+
+.gifs {
+    display: inline-block;
+    margin: 0 5px 10px 0;
+}
+
+/************** Colors *****************/
+body {
+    background: #fff;
+}
+
