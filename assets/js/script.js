@@ -2,11 +2,15 @@ $(document).ready(function(){
     var giphy = {
 
         topics: ["my neighbor totoro", "full metal alchemist",
-                 "one punch man", "attack on titan", "akira", 
-                 "gundam", "princess mononoke", "mob psycho 100", 
-                 "psycho pass", "outlaw star", "cowboy bebop", 
-                 "death note", "rurouni kenshin", "dragon ball z",
-                 "sword art online", "spirited away", "flcl"],
+            "one punch man", "attack on titan", "akira", 
+            "gundam", "princess mononoke", "mob psycho 100",                  
+            "psycho pass", "outlaw star", "cowboy bebop", 
+            "death note", "rurouni kenshin", "dragon ball z",
+            "sword art online", "spirited away", "flcl"],
+        
+        apiData: null,
+        
+        
         
         pushTopic: function (topic) {
             if (giphy.topics.indexOf(topic) == -1 && topic != "" && jQuery.trim(topic).length != 0) {
@@ -47,14 +51,14 @@ $(document).ready(function(){
                 url: "http://api.giphy.com/v1/gifs/search?q=" + topic + "&limit=10&api_key=dc6zaTOxFJmzC",
                 method: "GET",
             }).done(function(response) {
-                var gifData = response.data;
-                console.log(gifData);
-                gifToDom(gifData);
+                giphy.apiData = response.data;
+                console.log(giphy.apiData);
+                gifToDom(giphy.apiData);
             });
             
             function gifToDom(data) {
                 for (var item = 0; item < data.length; item++) {
-                    var thumbnail = data[item].images.fixed_height.url;
+                    var thumbnail = data[item].images.fixed_height_still.url;
                     var rating = data[item].rating;
                     giphy.setDom(thumbnail, rating, item);
                 }
@@ -87,6 +91,28 @@ $(document).ready(function(){
 
             setElement();
         },
+
+        setSrc: function (index, currentSrc) {
+            var gifItem = giphy.apiData[index];
+            var itemId = "#" + index;
+
+            function setImgSrc(id) {
+                $(id).attr("src", gifItem.images.fixed_height_still.url);
+                console.log(gifItem.images.fixed_height_still.url);
+            }
+
+            function setGifSrc(id) {
+                $(id).attr("src", gifItem.images.fixed_height.url);
+                console.log(gifItem.images.fixed_height_still.url);
+
+            }
+
+            if (gifItem.images.fixed_height_still.url == currentSrc) {
+                setGifSrc(itemId);
+            } else {
+                setImgSrc(itemId);
+            }
+        }
     }
 
     giphy.setInitialTopics(giphy.topics);
@@ -99,6 +125,7 @@ $(document).ready(function(){
     });
 
     $("#addAnime").on("click", function () {
+        $("#anime").empty();
         var newItem = $("#anime-input").val();
         giphy.pushTopic(newItem);
         giphy.getInfo(newItem);
@@ -108,7 +135,12 @@ $(document).ready(function(){
         $("#anime").empty();
         var currentTopic = $(this).text();
         currentTopic = currentTopic.replace(/ /g, '+');
-        console.log("Current topic is: " + currentTopic);
         giphy.getInfo(currentTopic);
+    });
+
+    $("#anime").on("click", ".gifs .imgs", function () {
+        var gifIndex = $(this).attr('id');
+        var gifSrc = $(this).attr('src');
+        giphy.setSrc(gifIndex, gifSrc);
     });
 });
