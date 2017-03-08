@@ -38,7 +38,7 @@ $(document).ready(function(){
         getInfo: function (topic) {
             $("#results").empty();
             $.ajax({
-                url: "http://api.giphy.com/v1/gifs/search?q=" + topic + "&limit=10&api_key=dc6zaTOxFJmzC",
+                url: "https://api.giphy.com/v1/gifs/search?q=" + topic + "&limit=10&api_key=dc6zaTOxFJmzC",
                 method: "GET",
             }).done(function(response) {
                 giphy.apiData = response.data;
