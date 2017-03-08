@@ -7,48 +7,41 @@ $(document).ready(function(){
             "psycho pass", "outlaw star", "cowboy bebop", 
             "death note", "rurouni kenshin", "dragon ball z",
             "sword art online", "spirited away", "flcl", 
-            "pom poko", "my hero academia", "gurren lagann"],
+            "pom poko", "my hero academia"],
         
-        apiData: null,
-
-        // Set topic if not current topic, empty string, or string of spaces.
-        setTopic: function (topic) {
-            if (giphy.topics.indexOf(topic) == -1 && topic != "" && jQuery.trim(topic).length != 0) {
-                $("#anime-input").val("");
-                giphy.topics.push(topic);
-                giphy.setButton(topic);
-            }
-        },
-
         // Set button for a topic.
         setButton: function (button) {
             function build(topic) {
                 var newButton = $("<button>");
-                newButton.attr("type", "button");
-                newButton.addClass("btn anime");
-                newButton.text(topic.toLowerCase());
+
+                newButton
+                    .attr("type", "button")
+                    .addClass("btn anime")
+                    .text(topic.toLowerCase());
+                
                 $("#animeButtons").append(newButton);
             }
             return build(button);
         },
 
-        // Set initial topics.
-        setInitialTopics: function (buttonTopics) {
-            for (var topicIndex = 0; topicIndex < buttonTopics.length; topicIndex++) {
-                var button = buttonTopics[topicIndex];
+        // Set topic if not current topic, empty string, or string of spaces.
+        setTopics: function () {
+            $("#animeButtons").empty();
+            $("#anime-input").val("");
+            for (var topicIndex = 0; topicIndex < giphy.topics.length; topicIndex++) {
+                var button = giphy.topics[topicIndex];
                 giphy.setButton(button);
             }
         },
 
         // Get API data for topic.
         getInfo: function (topic) {
-            $("#anime").empty();
+            $("#results").empty();
             $.ajax({
                 url: "http://api.giphy.com/v1/gifs/search?q=" + topic + "&limit=10&api_key=dc6zaTOxFJmzC",
                 method: "GET",
             }).done(function(response) {
                 giphy.apiData = response.data;
-                console.log(giphy.apiData);
                 gifToDom(giphy.apiData);
             });
 
@@ -56,73 +49,57 @@ $(document).ready(function(){
             function gifToDom(data) {
                 for (var item = 0; item < data.length; item++) {
                     var thumbnail = data[item].images.fixed_height_still.url;
+                    var gif = data[item].images.fixed_height.url;
                     var rating = data[item].rating;
-                    giphy.setDom(thumbnail, rating, item);
+
+                    giphy.setDom(thumbnail, gif, rating, item);
                 }
             }   
         },
 
         // Set DOM elements for a gif.
-        setDom: function (image, rating, item) {
+        setDom: function (image, gif, rating) {
             var newGif = $("<div>");
-            var ratElement = $("<p>");
-            var imgElement = $("<img>");
 
             // Set rating DOM element.
-            function setRating(ele, rating) {
-                ele.text("Rating: " + rating);
-                newGif.append(ele);
+            function setRating(rating) {
+                var ratElement = $("<p>");
+                ratElement.text("Rating: " + rating);
+                newGif.append(ratElement);
             }
 
             // Set image DOM element.
-            function setImage(ele, img, item) {
-                ele.addClass("imgs");
-                ele.attr("src", img);
-                ele.attr("id", item);
-                newGif.append(ele);
+            function setImage(img, gif) {
+                var imgElement = $("<img>");
+
+                imgElement
+                    .addClass("imgs")
+                    .attr("src", img)
+                    .attr("data-state", "still")
+                    .attr("data-still", img)
+                    .attr("data-animate", gif);
+                
+                newGif.append(imgElement);
             }
 
             // Set element to DOM.
             function setElement() {
                 newGif.addClass("gifs");
-                $("#anime").append(newGif);
-                setRating(ratElement, rating);
-                setImage(imgElement, image, item);
+                $("#results").append(newGif);
+                setRating(rating);
+                setImage(image, gif);
             }
 
             setElement();
-        },
-
-        // Set image source
-        setSrc: function (index, currentSrc) {
-            var gifItem = giphy.apiData[index];
-            var itemId = "#" + index;
-
-            // Set to image
-            function setImgSrc(id) {
-                $(id).attr("src", gifItem.images.fixed_height_still.url);
-            }
-
-            // Set to gif
-            function setGifSrc(id) {
-                $(id).attr("src", gifItem.images.fixed_height.url);
-            }
-
-            // Check if current image source is the image or gif
-            if (gifItem.images.fixed_height_still.url == currentSrc) {
-                setGifSrc(itemId);
-            } else {
-                setImgSrc(itemId);
-            }
         }
     }
 
-    giphy.setInitialTopics(giphy.topics);
+    giphy.setTopics();
 
     // Prevents enter key press from reloading page.
     $(window).keydown(function(event){
         if (event.keyCode == 13) {
-            event.preventDefault();
+            $("#addAnime").click();
             return false;
         }
     });
@@ -130,21 +107,29 @@ $(document).ready(function(){
     // Push new topic to array and get API data for it when pushing Submit
     $("#addAnime").on("click", function () {
         var newItem = $("#anime-input").val();
-        giphy.setTopic(newItem);
-        giphy.getInfo(newItem);
+        if (giphy.topics.indexOf(newItem) == -1 && newItem != "" && jQuery.trim(newItem).length != 0) {
+            giphy.topics.push(newItem);
+            
+            giphy.setTopics();
+            giphy.getInfo(newItem);
+        }
     });
 
     // Get API data when pressing a topic button
     $("#animeButtons").on("click", ".anime", function () {
-        var currentTopic = $(this).text();
-        currentTopic = currentTopic.replace(/ /g, '+');
+        var currentTopic = $(this).text().replace(/ /g, '+');
         giphy.getInfo(currentTopic);
     });
 
     // Get gif index and image source when clicking a gif
-    $("#anime").on("click", ".gifs .imgs", function () {
-        var gifIndex = $(this).attr('id');
-        var gifSrc = $(this).attr('src');
-        giphy.setSrc(gifIndex, gifSrc);
+    $("#results").on("click", ".gifs .imgs", function () {
+        var state = $(this).attr("data-state");
+        if (state === "still") {
+            $(this).attr("src", $(this).attr("data-animate"));
+            $(this).attr("data-state", "animate");
+        } else {
+            $(this).attr("src", $(this).attr("data-still"));
+            $(this).attr("data-state", "still");
+        }
     });
 });

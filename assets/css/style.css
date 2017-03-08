@@ -7,20 +7,14 @@
     margin-top: 40px;
 }
 
-.anime {
+.btn {
+    color: #000;
     margin: 2px 5px 2px 0;
-    background: #000;
-    border-color: #fff;
-    border-radius: 0;
-    padding: 0 5px 0 0;
     border-width: 0 2px 0 0;
 }
 
-.anime:hover, .anime:focus, .anime:active {
-    color: #808080;
-    background: #000;
-    border-color: #fff;
-    outline:0;
+.btn:hover, .btn:focus, .btn:active {
+    color: #fff;
 }
 
 .gifs {
